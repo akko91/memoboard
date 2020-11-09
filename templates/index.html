@@ -52,10 +52,11 @@
             }
 
             #openMemo {
-                border: 2px solid #F0F;
                 width: 900px;
                 margin: 20px auto;
-                padding: 10px;
+                padding: 50px;
+                border: black solid;
+                border-radius: 5px;
                 display: none;
             }
 
@@ -65,7 +66,7 @@
         </style>
         <script>
             $(document).ready(function () {
-                showMemo();
+                showMemo()
             });
 
             // 새글 쓰기 버튼을 눌렀을때
@@ -87,9 +88,8 @@
                 let title = $("#post-title").val()
                 let content = $("#post-content").val()
 
-
                 let now = new Date();
-                let date = now.toLocaleDateString('en-US');
+                let date = now.getFullYear() + "-" + Number(now.getMonth() + 1) + "-" + now.getDate() + " " + now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds()
 
                 $.ajax({
                     type: "POST",
@@ -104,33 +104,57 @@
                 })
             }
 
-            //게시글 불러오기
+            //게시글 목록 불러오기
             function showMemo() {
                 //alert("게시글 불러오기");
                 $.ajax({
                     type: "GET",
-                    url: "",
+                    url: "/memolist",
                     data: {},
                     success: function (response) {
+
+                        let memoList = response['memoList'];
+                        let memoId = response['memoId'];
+
+                        for (let i = 0; i < memoList.length; i++) {
+                            let no = i + 1;
+                            let id = memoId[i];
+                            let title = memoList[i]["title"];
+                            let writer = memoList[i]["writer"];
+                            let date = memoList[i]["date"];
+
+                            // console.log(id);
+
+                            let tempHtml = `<tr onclick="memoOpen('${id}', '${writer}', '${date}')">
+                                                <th scope="row">${no}</th>
+                                                <td>${title}</td>
+                                                <td>${writer}</td>
+                                                <td>${date}</td>
+                                            </tr>`;
+
+                            $("#memolist").append(tempHtml);
+
+                        }
 
                     }
                 })
             }
 
+
             //게시글 눌렀을때 하나의 메모
-            function memoOpen() {
-                alert("메모 오픈");
+            function memoOpen(id, writer, date) {
+                // alert(id)
+
                 $("#openMemo").show();
 
                 $.ajax({
-                    type: "GET",
-                    url: "",
-                    data: {},
+                    type: "POST",
+                    url: "/memo_one",
+                    data: {'id': id, 'writer': writer, 'date': date},
                     success: function (response) {
-
+                        // let memo = response['memo'];
                     }
                 })
-
 
             }
 
@@ -196,13 +220,8 @@
                     <th scope="col">작성일</th>
                 </tr>
                 </thead>
-                <tbody>
-                <tr onclick="memoOpen()">
-                    <th scope="row">1</th>
-                    <td>제목</td>
-                    <td>글쓴이</td>
-                    <td>작성일</td>
-                </tr>
+                <tbody id="memolist">
+
                 </tbody>
             </table>
 
