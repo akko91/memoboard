@@ -2,6 +2,7 @@ from bson import objectid
 from flask import Flask, render_template, jsonify, request
 import requests
 from pymongo import MongoClient
+from bson.objectid import ObjectId
 
 app = Flask(__name__)
 
@@ -39,8 +40,8 @@ def post_memo():
 # 목록 읽기
 @app.route('/memolist', methods=['GET'])
 def get_memolist():
-    memo_list = list(db.memoboard.find({}, {"_id": False}).sort('_id', -1))
-    id = list(db.memoboard.find({}, {"title": False, "content": False, "writer": False, "date": False}).sort('_id', -1))
+    memo_list = list(db.memoboard.find({}, {"_id": False}).sort('date', -1))
+    id = list(db.memoboard.find({}, {"title": False, "content": False, "writer": False, "date": False}).sort('date', -1))
     # print(memo_list)
 
     id_list = [str(i["_id"]) for i in id]
@@ -52,35 +53,38 @@ def get_memolist():
 
 
 # 메모 읽기
-@app.route('/memo_one', methods=['POST'])
+@app.route('/memo', methods=['GET'])
 def get_memo():
     # id = request.form['id']
-    writer = request.form['writer']
-    date = request.form['date']
+    id = request.args.get('id')
 
-    # print(writer, date)
+    memo = list(db.memoboard.find({"_id": ObjectId(id)},{"_id": False}))
 
-    memo = list(db.memoboard.find({'date': date}, {'_id': False}))
-    # memo db.memoboard.find({ $and: [{'writer': writer}, {'date': date} ] })
+    # print(memo)
 
-    # memo = list(db.memoboard.find({"_id":ObjectId(id)})) 오브젝트 아이디로 검색하는 방법 찾지못함.
-
-
-    print(memo)
-
-
-    return jsonify({'result': 'success', 'msg': '메모 불러오기 완료!'})
+    return jsonify({'result': 'success', 'memo': memo, 'id': id})
 
 
 # 삭제
 @app.route('/memo', methods=['DELETE'])
 def delete_memo():
+    id = request.form['id']
+    # print(id)
+
+    db.memoboard.delete_one({"_id": ObjectId(id)})
+
+
     return jsonify({'result': 'success', 'msg': '메모 삭제 완료!'})
 
 
 # 수정
 @app.route('/memo', methods=['PUT'])
 def put_memo():
+    id = request.form['id']
+    title = request.form['title']
+    content = request.form['content']
+
+    db.memoboard.update({"_id": ObjectId(id)},{'$set': {"title": title, "content":content}})
     return jsonify({'result': 'success', 'msg': '메모 수정 완료!'})
 
 
