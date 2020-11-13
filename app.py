@@ -40,14 +40,15 @@ def post_memo():
 # 목록 읽기
 @app.route('/memolist', methods=['GET'])
 def get_memolist():
-    memo_list = list(db.memoboard.find({}, {"_id": False}).sort('date', -1))
-    id = list(db.memoboard.find({}, {"title": False, "content": False, "writer": False, "date": False}).sort('date', -1))
-    # print(memo_list)
+    memo_list = list(db.memoboard.find({}, {"_id": False}).skip(0).limit(10).sort('date', -1))
+    id = list(db.memoboard.find({}, {"title": False, "content": False, "writer": False, "date": False}).skip(0).limit(10).sort('date', -1))
+    memo_count = db.memoboard.count()
+    # print(memo_count)
 
     id_list = [str(i["_id"]) for i in id]
     # print(id_list)
 
-    memo_json = {"response": "success", "memoList": memo_list, "memoId": id_list}
+    memo_json = {"response": "success", "memoList": memo_list, "memoId": id_list, "memoCount":memo_count}
 
     return jsonify(memo_json)
 

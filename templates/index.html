@@ -63,15 +63,80 @@
             #postingBtn {
                 float: right;
             }
+
+            .paging {
+                margin-top: 15px;
+                text-align: center;
+                font-size: 0;
+            }
+
+            .paging a,
+            .paging strong {
+                display: inline-block;
+                width: 20px;
+                height: 18px;
+                margin: 0 1px;
+                border: 1px solid #dbdbdb;
+                color: #767676;
+                font-size: 11px;
+                font-weight: bold;
+                line-height: 20px;
+                vertical-align: middle;
+                text-decoration: none;
+            }
+
+            .paging a:hover,
+            .paging a:active,
+            .paging a:focus {
+                border: 1px solid #4c8500;
+            }
+
+            .paging strong {
+                color: #fff;
+                background: #4c8500;
+                border: 1px solid #4c8500;
+            }
+
+            .paging .direction {
+                background: url('http://leroro.net/images/ui/sp_btn_paging.gif') no-repeat;
+            }
+
+            .paging .direction.first {
+                background-position: left top;
+            }
+
+            .paging .direction.prev {
+                margin: 0 12px 0 1px;
+                background-position: -20px 0;
+            }
+
+            .paging .direction.next {
+                margin: 0 1px 0 12px;
+                background-position: -40px 0;
+            }
+
+            .paging .direction.last {
+                background-position: right top;
+            }
+
+            .paging .direction span {
+                position: absolute;
+                display: block;
+                width: 20px;
+                height: 18px;
+                overflow: hidden;
+                z-index: -1;
+            }
         </style>
         <script>
             $(document).ready(function () {
                 showMemo()
+                pageing()
             });
 
             // 새글 쓰기 버튼을 눌렀을때
             function postOpen() {
-                if($('#openMemo').css('display') == 'block'){
+                if ($('#openMemo').css('display') == 'block') {
                     $("#openMemo").hide();
                 }
                 $("#post-box").show();
@@ -83,7 +148,7 @@
             }
 
             //수정하기안에 취소 버튼 눌렀을때
-            function editClose(){
+            function editClose() {
                 $("#openMemo").hide();
             }
 
@@ -117,7 +182,6 @@
                 //alert("게시글 불러오기");
 
 
-
                 $.ajax({
                     type: "GET",
                     url: "/memolist",
@@ -126,9 +190,22 @@
 
                         let memoList = response['memoList'];
                         let memoId = response['memoId'];
+                        let memoCount = response['memoCount'];
+
+                        let maxPage = Math.floor((memoCount/10)+1)
+                        // alert(maxPage)
+                        let tempPaging = `<a href="#" class="direction fisrt"><span>처음</span></a>
+                                        <a href="#" class="direction prev"><span>이전</span></a>
+                                        <strong>1</strong>`;
+
+                        for(let i= 2; i<= maxPage;i++){
+                            tempPaging +=`<a href="#">${i}</a>`;
+                        }
+                        tempPaging += `<a href="#" class="direction next"><span>다음</span></a>
+                                        <a href="#" class="direction last"><span>끝</span></a>`;
 
                         for (let i = 0; i < memoList.length; i++) {
-                            let no = memoList.length -i;
+                            let no = memoList.length - i;
                             let id = memoId[i];
                             let title = memoList[i]["title"];
                             let writer = memoList[i]["writer"];
@@ -146,6 +223,7 @@
                             $("#memolist").append(tempHtml);
 
                         }
+                        $(".paging").append(tempPaging);
 
                     }
                 })
@@ -159,7 +237,7 @@
                 $("#openMemo").empty();
                 $("#openMemo").show();
 
-                if($('#post-box').css('display') == 'block'){
+                if ($('#post-box').css('display') == 'block') {
                     $("#post-box").hide();
                 }
 
@@ -195,8 +273,9 @@
                 })
 
             }
+
             // 메모삭제 함수
-            function deleteMemo(id){
+            function deleteMemo(id) {
                 $.ajax({
                     type: "DELETE",
                     url: "/memo",
@@ -210,7 +289,7 @@
                 })
             }
 
-            function editMemo(){
+            function editMemo() {
                 document.getElementById('editTitle').readOnly = false;
                 document.getElementById('editContent').readOnly = false;
                 document.getElementById("editMemo").style.display = "none";
@@ -222,7 +301,7 @@
 
 
             // 메모 수정할수 있는 div 띄우는 함수
-            function editMemoDb(id){
+            function editMemoDb(id) {
 
                 let title = $("#editTitle").val()
                 let content = $("#editContent").val()
@@ -235,7 +314,7 @@
                 $.ajax({
                     type: "PUT",
                     url: "/memo",
-                    data: {"id": id, "title":title, "content":content},
+                    data: {"id": id, "title": title, "content": content},
                     success: function (response) {
                         if (response["result"] == "success") {
                             alert(response["msg"]);
@@ -243,6 +322,10 @@
                         }
                     }
                 })
+            }
+
+            function pageing(){
+
             }
 
         </script>
@@ -271,7 +354,7 @@
                     <button type="button" class="btn btn-primary" id="postClose" onclick="postClose()">닫기</button>
                 </div>
             </div>
-<!--            하나의 메모 공간-->
+            <!--            하나의 메모 공간-->
             <div id="openMemo">
 
             </div>
@@ -290,8 +373,12 @@
                 <tbody id="memolist">
 
                 </tbody>
-            </table>
 
+
+            </table>
+            <div class="paging">
+
+            </div>
         </div>
     </body>
 
