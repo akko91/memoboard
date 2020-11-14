@@ -40,9 +40,14 @@ def post_memo():
 # 목록 읽기
 @app.route('/memolist', methods=['GET'])
 def get_memolist():
-    memo_list = list(db.memoboard.find({}, {"_id": False}).skip(0).limit(10).sort('date', -1))
-    id = list(db.memoboard.find({}, {"title": False, "content": False, "writer": False, "date": False}).skip(0).limit(10).sort('date', -1))
+    page = request.args.get('page')
+    nowpage = (int(page)-1)*10
+    # print(nowpage)
+
+    memo_list = list(db.memoboard.find({}, {"_id": False}).skip(nowpage).limit(10).sort('date', -1))
+    id = list(db.memoboard.find({}, {"title": False, "content": False, "writer": False, "date": False}).skip(nowpage).limit(10).sort('date', -1))
     memo_count = db.memoboard.count()
+
     # print(memo_count)
 
     id_list = [str(i["_id"]) for i in id]

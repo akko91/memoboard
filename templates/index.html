@@ -130,8 +130,8 @@
         </style>
         <script>
             $(document).ready(function () {
-                showMemo()
-                pageing()
+                showMemo(1)
+                // pageing()
             });
 
             // 새글 쓰기 버튼을 눌렀을때
@@ -178,31 +178,43 @@
             }
 
             //게시글 목록 불러오기
-            function showMemo() {
+            function showMemo(page) {
                 //alert("게시글 불러오기");
-
-
+                $("#memolist").empty();
+                $(".paging").empty();
                 $.ajax({
                     type: "GET",
-                    url: "/memolist",
+                    url: `/memolist?page=${page}`,
                     data: {},
                     success: function (response) {
 
                         let memoList = response['memoList'];
                         let memoId = response['memoId'];
                         let memoCount = response['memoCount'];
-
                         let maxPage = Math.floor((memoCount/10)+1)
+
                         // alert(maxPage)
-                        let tempPaging = `<a href="#" class="direction fisrt"><span>처음</span></a>
+                        let tempPaging = ``;
+                        if(page == 1){
+                            tempPaging = `<a href="#" class="direction fisrt" onclick="showMemo(1)"><span>처음</span></a>
                                         <a href="#" class="direction prev"><span>이전</span></a>
-                                        <strong>1</strong>`;
+                                        <strong onclick="showMemo(1)">1</strong>`;
+                        }else {
+                            tempPaging = `<a href="#" class="direction fisrt" onclick="showMemo(1)"><span>처음</span></a>
+                                        <a href="#" class="direction prev"><span>이전</span></a>
+                                        <a href="#" onclick="showMemo(1)">1</a>`;
+                        }
 
                         for(let i= 2; i<= maxPage;i++){
-                            tempPaging +=`<a href="#">${i}</a>`;
+                            if(page == i){
+                                tempPaging +=`<strong href="#" onclick="showMemo(${i})">${i}</strong>`;
+                            }else{
+                                tempPaging +=`<a href="#" onclick="showMemo(${i})">${i}</a>`;
+                            }
+
                         }
                         tempPaging += `<a href="#" class="direction next"><span>다음</span></a>
-                                        <a href="#" class="direction last"><span>끝</span></a>`;
+                                       <a href="#" class="direction last" onclick="showMemo(${maxPage})><span>끝</span></a>`;
 
                         for (let i = 0; i < memoList.length; i++) {
                             let no = memoList.length - i;
@@ -221,6 +233,7 @@
                                             </tr>`;
 
                             $("#memolist").append(tempHtml);
+
 
                         }
                         $(".paging").append(tempPaging);
