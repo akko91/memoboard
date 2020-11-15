@@ -53,7 +53,7 @@ def get_memolist():
     id_list = [str(i["_id"]) for i in id]
     # print(id_list)
 
-    memo_json = {"response": "success", "memoList": memo_list, "memoId": id_list, "memoCount":memo_count}
+    memo_json = {"response": "success", "memoList": memo_list, "memoId": id_list, "memoCount": memo_count}
 
     return jsonify(memo_json)
 
