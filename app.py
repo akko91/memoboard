@@ -1,5 +1,5 @@
 from bson import objectid
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, json
 import requests
 from pymongo import MongoClient
 from bson.objectid import ObjectId
@@ -92,6 +92,31 @@ def put_memo():
 
     db.memoboard.update({"_id": ObjectId(id)},{'$set': {"title": title, "content":content}})
     return jsonify({'result': 'success', 'msg': '메모 수정 완료!'})
+
+# 카카오로그인
+@app.route('/loginkakao', methods=['GET'])
+def login_kakao():
+    code = str(request.args.get('code'))
+    token_request = requests.get("https://kauth.kakao.com/oauth/token?grant_type=authorization_code&client_id=df475ca2677579b0061637b140098f01&redirect_uri=http://localhost:5000/loginkakao&code="+str(code))
+    token_json = token_request.json()
+
+    access_token = token_json.get("access_token")
+
+    profile_request = requests.get("https://kapi.kakao.com/v2/user/me", headers={"Authorization": "Bearer " + access_token} )
+    profile_json = profile_request.json()
+
+    kakao_account = profile_json.get("kakao_account")
+
+    profile = kakao_account['profile']
+    kakao_id = profile_json.get("id")
+
+    # email = kakao_account.get("email", None)
+    # print("id:"+kakao_id+", "+"nickname: "+ nickname)
+
+    return jsonify({'result': 'success', 'profile': profile, 'kakao_id': kakao_id })
+
+
+
 
 
 if __name__ == '__main__':

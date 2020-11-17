@@ -130,8 +130,8 @@
         </style>
         <script>
             $(document).ready(function () {
+
                 showMemo(1)
-                // pageing()
             });
 
             // 새글 쓰기 버튼을 눌렀을때
@@ -191,42 +191,42 @@
                         let memoList = response['memoList'];
                         let memoId = response['memoId'];
                         let memoCount = response['memoCount'];
-                        let maxPage = Math.floor((memoCount/10)+1)
+                        let maxPage = Math.floor((memoCount / 10) + 1)
                         let prevPage;
                         let nextPage;
-                        let noA = memoCount - (( maxPage -1 )*10 ) + 1; // 게시글 no 계산에 필요한 변수 a
-                        let noB = (maxPage - page - 1)*10; // 게시글 no 계산에 필요한 변수 b
+                        let noA = memoCount - ((maxPage - 1) * 10) + 1; // 게시글 no 계산에 필요한 변수 a
+                        let noB = (maxPage - page - 1) * 10; // 게시글 no 계산에 필요한 변수 b
 
-                        if(page == 1){
+                        if (page == 1) {
                             prevPage = page;
                             nextPage = page + 1;
-                        } else if(page == maxPage){
-                            prevPage = page -1;
+                        } else if (page == maxPage) {
+                            prevPage = page - 1;
                             nextPage = page;
-                        } else{
-                            prevPage = page -1;
-                            nextPage = page +1;
+                        } else {
+                            prevPage = page - 1;
+                            nextPage = page + 1;
                         }
 
                         // console.log("이전페이지:"+prevPage+" 다음페이지:"+nextPage )
                         // alert(maxPage)
 
                         let tempPaging = ``;
-                        if(page == 1){
+                        if (page == 1) {
                             tempPaging += `<a href="#" class="direction fisrt" onclick="showMemo(1)"><span>처음</span></a>
                                         <a href="#" class="direction prev" onclick="showMemo(${prevPage})"><span>이전</span></a>
                                         <strong onclick="showMemo(1)">1</strong>`;
-                        }else {
+                        } else {
                             tempPaging += `<a href="#" class="direction fisrt" onclick="showMemo(1)"><span>처음</span></a>
                                         <a href="#" class="direction prev" onclick="showMemo(${prevPage})" ><span>이전</span></a>
                                         <a href="#" onclick="showMemo(1)">1</a>`;
                         }
 
-                        for(let i= 2; i<= maxPage;i++){
-                            if(page == i){
-                                tempPaging +=`<strong href="#" onclick="showMemo(${i})">${i}</strong>`;
-                            }else{
-                                tempPaging +=`<a href="#" onclick="showMemo(${i})">${i}</a>`;
+                        for (let i = 2; i <= maxPage; i++) {
+                            if (page == i) {
+                                tempPaging += `<strong href="#" onclick="showMemo(${i})">${i}</strong>`;
+                            } else {
+                                tempPaging += `<a href="#" onclick="showMemo(${i})">${i}</a>`;
                             }
 
                         }
@@ -240,9 +240,9 @@
                             let writer = memoList[i]["writer"];
                             let date = memoList[i]["date"];
 
-                            if( page == maxPage){
+                            if (page == maxPage) {
                                 no = memoList.length - i;
-                            } else{
+                            } else {
                                 no = noA + noB + 9 - i;
                             }
 
@@ -359,8 +359,20 @@
                 })
             }
 
-            function pageing(){
+            function loginKakao() {
+                $.ajax({
+                    type: "GET",
+                    url: "/loginkakao",
+                    data: {},
+                    success: function (response) {
+                        if (response["result"] == "success") {
+                            let profile = response['profile'];
+                            alert(profile);
 
+                            console.log(profile);
+                        }
+                    }
+                })
             }
 
         </script>
@@ -412,6 +424,15 @@
 
             </table>
             <div class="paging">
+
+            </div>
+            <div>
+                <a href="https://kauth.kakao.com/oauth/authorize?client_id=df475ca2677579b0061637b140098f01&redirect_uri=http://localhost:5000/loginkakao&response_type=code" onclick="window.open(this.href, '_blank', 'width=400, height=800, toolbars=no, scrollbars=yes'); loginKakao(); return false;">
+                    <img src="https://developers.kakao.com/tool/resource/static/img/button/login/full/ko/kakao_login_large_wide.png">
+                </a>
+<!--                <img src="https://developers.kakao.com/tool/resource/static/img/button/login/full/ko/kakao_login_large_wide.png" onclick="loginKakao()">-->
+<!--                <a href="https://kauth.kakao.com/oauth/authorize?client_id=df475ca2677579b0061637b140098f01&redirect_uri=http://localhost:5000/loginkakao&response_type=code">로그인</a>-->
+<!--                <a href="https://kauth.kakao.com/oauth/authorize?client_id=df475ca2677579b0061637b140098f01&redirect_uri=http://localhost:5000/oauth&response_type=code">로그인</a>-->
 
             </div>
         </div>
